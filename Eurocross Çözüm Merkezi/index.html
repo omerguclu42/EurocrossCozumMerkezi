@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eurocross Çözüm Merkezi</title>
+    <link rel="stylesheet" href="style.css?v=9">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- App Container -->
+    <div id="app">
+        <!-- Login View -->
+        <div id="login-view" class="view active">
+            <div class="login-container glass-panel">
+                <div class="login-header">
+                    <img src="ProjeLogo.jpg" alt="Eurocross Çözüm Merkezi Logo" class="project-logo">
+                    <h2>Eurocross Çözüm Merkezi</h2>
+                    <p class="motto">"Gelişimin Sesi, Çözümün Merkezi"</p>
+                </div>
+                <form id="login-form">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" placeholder="Kullanıcı Adı" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Şifre" required>
+                    </div>
+                    <p id="login-error" class="error-text hidden">Kullanıcı adı veya şifre hatalı.</p>
+                    <button type="submit" class="btn-primary">Giriş Yap</button>
+                </form>
+                <div class="login-footer">
+                    <img src="ŞirketLogo.png" alt="Company Logo" class="company-logo">
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading View -->
+        <div id="loading-view" class="view hidden">
+            <div class="loading-content">
+                <img src="Gif1.gif" alt="Yükleniyor..." class="loading-gif">
+                <h3 class="loading-text">Sisteme Giriş Yapılıyor<span class="dots"></span></h3>
+            </div>
+        </div>
+
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="view hidden">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <img src="ProjeLogo.jpg" alt="Logo" class="sidebar-logo">
+                </div>
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li id="nav-dashboard" class="active"><a href="#" onclick="switchView('dashboard')"><i class="fas fa-home"></i> Ana Sayfa</a></li>
+                        <li id="nav-opinions" class="hidden"><a href="#" onclick="switchView('opinions')"><i class="fas fa-inbox"></i> Görüş Bekleniyor <span id="opinions-badge" class="badge" style="background:#e74c3c; color:white; padding:2px 8px; border-radius:10px; font-size:0.75rem; margin-left:5px; display:none;">0</span></a></li>
+                        <li id="nav-reports-internal" style="display:none;"><a href="#" onclick="switchView('reports-internal')"><i class="fas fa-chart-bar"></i> İç Raporlar</a></li>
+                        <li id="nav-reports-external" style="display:none;"><a href="#" onclick="switchView('reports-external')"><i class="fas fa-globe"></i> Dış Raporlar</a></li>
+                    </ul>
+                </nav>
+                <div class="sidebar-footer">
+                    <div class="user-info">
+                        <div class="avatar"><i class="fas fa-user-circle"></i></div>
+                        <div class="user-details">
+                            <span id="display-user-name" class="user-name">Kullanıcı</span>
+                            <small id="display-user-dept" class="user-meta"><i class="fas fa-building"></i> Departman</small>
+                            <small id="display-user-role" class="user-meta"><i class="fas id-badge"></i> Pozisyon</small>
+                            <small id="display-user-mail" class="user-meta"><i class="fas fa-envelope"></i> mail@eurocross.com</small>
+                            <button id="logout-btn" class="btn-logout-full" style="margin-top: 12px;"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <header class="topbar">
+                    <!-- Üst bar boşaltıldı, sadece şekil olarak duruyor veya logout buraya alınabilir -->
+                </header>
+
+                <div class="content-body">
+                    <div class="dashboard-header">
+                        <div>
+                            <h1 id="dashboard-welcome-msg">Hoş Geldin</h1>
+                        </div>
+                        <button id="new-complaint-btn" class="btn-primary btn-lg">
+                            <i class="fas fa-plus"></i> Yeni Şikayet Oluştur
+                        </button>
+                    </div>
+
+                    <!-- Layout changed: separate stats per table -->
+                    <div class="dashboard-tables-container mt-40">
+                        
+                        <!-- =========================
+                             TABLE 0: MÜŞTERİ (DIŞ) ŞİKAYETLERİ
+                             ========================= -->
+                        <div id="client-complaints-wrapper" class="table-section mb-30" style="padding: 25px; display: none;">
+                            <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; margin-bottom: 25px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <h3 style="font-size: 1.3rem; color: #2980b9;"><i class="fas fa-briefcase"></i> Dış Müşteri Şikayetleri</h3>
+                                    <button class="btn-secondary export-excel-btn" data-export-type="client" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 12px; background: white;"><i class="fas fa-file-excel" style="color: #27ae60; font-size: 1.1rem;"></i> Tablo Olarak Al</button>
+                                </div>
+                                
+                                <!-- Client Stats -->
+                                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; margin-bottom: 0;">
+                                    <div class="stat-card" style="padding: 15px;">
+                                        <div class="stat-icon open" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-envelope-open-text"></i></div>
+                                        <div class="stat-info">
+                                            <h3 style="font-size: 0.85rem;">Açık</h3>
+                                            <h2 id="client-stat-open" style="font-size: 1.4rem;">0</h2>
+                                        </div>
+                                    </div>
+                                    <div class="stat-card" style="padding: 15px;">
+                                        <div class="stat-icon process" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-spinner"></i></div>
+                                        <div class="stat-info">
+                                            <h3 style="font-size: 0.85rem;">İşlemde</h3>
+                                            <h2 id="client-stat-process" style="font-size: 1.4rem;">0</h2>
+                                        </div>
+                                    </div>
+                                    <div class="stat-card" style="padding: 15px;">
+                                        <div class="stat-icon resolved" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-check-circle"></i></div>
+                                        <div class="stat-info">
+                                            <h3 style="font-size: 0.85rem;">Çözümlenen</h3>
+                                            <h2 id="client-stat-resolved" style="font-size: 1.4rem;">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Client Filters -->
+                                <div class="filters-container modern-filters">
+                                    <input type="text" id="filter-client-id" class="filter-item" placeholder="Şikayet No ile Ara">
+                                    <select id="filter-client-status" class="filter-item"><option value="">Tüm Statüler</option></select>
+                                    <select id="filter-client-year" class="filter-item"><option value="">Tüm Yıllar</option><option value="2026">2026</option></select>
+                                    <select id="filter-client-month" class="filter-item"><option value="">Tüm Aylar</option><option value="01">Ocak</option><option value="02">Şubat</option><option value="03">Mart</option><option value="04">Nisan</option><option value="05">Mayıs</option><option value="06">Haziran</option><option value="07">Temmuz</option><option value="08">Ağustos</option><option value="09">Eylül</option><option value="10">Ekim</option><option value="11">Kasım</option><option value="12">Aralık</option></select>
+                                    <!-- Only shown for internal authorized users: -->
+                                    <select id="filter-client-customer" class="filter-item" style="display:none;"><option value="">Tüm Müşteriler</option></select>
+                                    <input type="text" id="filter-client-policy" class="filter-item" placeholder="Poliçe No">
+                                    <input type="text" id="filter-client-name" class="filter-item" placeholder="Sigortalı Adı">
+                                    <input type="text" id="filter-client-phone" class="filter-item" placeholder="Telefon No">
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="client-complaints-table">
+                                    <thead>
+                                        <tr class="sortable-headers">
+                                            <th data-sort="id" data-table="client">Şikayet No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="status" data-table="client">Statü <i class="fas fa-sort"></i></th>
+                                            <th data-sort="date" data-table="client">Oluşturulma Tarihi <i class="fas fa-sort"></i></th>
+                                            <th data-sort="customer" data-table="client" class="col-client-customer" style="display:none;">Müşteri Adı <i class="fas fa-sort"></i></th>
+                                            <th data-sort="policyNo" data-table="client">Poliçe No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="name" data-table="client">Sigortalı Adı <i class="fas fa-sort"></i></th>
+                                            <th data-sort="phone" data-table="client">Telefon <i class="fas fa-sort"></i></th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="client-complaints-tbody">
+                                        <!-- Dynamic data -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination Container -->
+                            <div class="pagination-container" id="client-pagination" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;"></div>
+                        </div>
+
+                        <!-- =========================
+                             TABLE 1: HİZMET ŞİKAYETLERİ
+                             ========================= -->
+                        <div id="service-complaints-wrapper" class="table-section mb-30" style="padding: 25px;">
+                            <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; margin-bottom: 25px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <h3 style="font-size: 1.3rem; color: var(--primary-orange);"><i class="fas fa-hammer"></i> İç Müşteri Hizmet Şikayetleri</h3>
+                                    <button class="btn-secondary export-excel-btn" data-export-type="srv" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 12px; background: white;"><i class="fas fa-file-excel" style="color: #27ae60; font-size: 1.1rem;"></i> Tablo Olarak Al</button>
+                                </div>
+                                
+                                <!-- Service Stats -->
+                                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; margin-bottom: 0;">
+                                    <div class="stat-card" style="padding: 15px;">
+                                        <div class="stat-icon open" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-envelope-open-text"></i></div>
+                                        <div class="stat-info">
+                                            <h3 style="font-size: 0.85rem;">Açık</h3>
+                                            <h2 id="srv-stat-open" style="font-size: 1.4rem;">0</h2>
+                                        </div>
+                                    </div>
+                                    <div class="stat-card" style="padding: 15px;">
+                                        <div class="stat-icon process" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-spinner"></i></div>
+                                        <div class="stat-info">
+                                            <h3 style="font-size: 0.85rem;">İşlemde</h3>
+                                            <h2 id="srv-stat-process" style="font-size: 1.4rem;">0</h2>
+                                        </div>
+                                    </div>
+                                    <div class="stat-card" style="padding: 15px;">
+                                        <div class="stat-icon resolved" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-check-circle"></i></div>
+                                        <div class="stat-info">
+                                            <h3 style="font-size: 0.85rem;">Çözümlenen</h3>
+                                            <h2 id="srv-stat-resolved" style="font-size: 1.4rem;">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Service Filters -->
+                                <div class="filters-container modern-filters">
+                                    <input type="text" id="filter-srv-id" class="filter-item" placeholder="Şikayet No ile Ara">
+                                    <select id="filter-srv-status" class="filter-item"><option value="">Tüm Statüler</option></select>
+                                    <select id="filter-srv-dept" class="filter-item"><option value="">Tüm Departmanlar</option></select>
+                                    <select id="filter-srv-year" class="filter-item"><option value="">Tüm Yıllar</option><option value="2026">2026</option></select>
+                                    <select id="filter-srv-month" class="filter-item"><option value="">Tüm Aylar</option><option value="01">Ocak</option><option value="02">Şubat</option><option value="03">Mart</option><option value="04">Nisan</option><option value="05">Mayıs</option><option value="06">Haziran</option><option value="07">Temmuz</option><option value="08">Ağustos</option><option value="09">Eylül</option><option value="10">Ekim</option><option value="11">Kasım</option><option value="12">Aralık</option></select>
+                                    <input type="text" id="filter-srv-ts" class="filter-item" placeholder="Dosya No (TS...)">
+                                    <select id="filter-srv-customer" class="filter-item"><option value="">Tüm Müşteriler</option></select>
+                                    <input type="text" id="filter-srv-name" class="filter-item" placeholder="Sigortalı Adı">
+                                    <select id="filter-srv-type" class="filter-item"><option value="">Tüm Hizmet Türleri</option></select>
+                                    <select id="filter-srv-provider" class="filter-item"><option value="">Tüm Tedarikçiler</option></select>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="service-complaints-table">
+                                    <thead>
+                                        <tr class="sortable-headers">
+                                            <th data-sort="id" data-table="srv">Şikayet No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="status" data-table="srv">Statü <i class="fas fa-sort"></i></th>
+                                            <th data-sort="department" data-table="srv">Departman <i class="fas fa-sort"></i></th>
+                                            <th data-sort="date" data-table="srv">Oluşturulma Tarihi <i class="fas fa-sort"></i></th>
+                                            <th data-sort="tsNumber" data-table="srv">Dosya No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="customer" data-table="srv">Müşteri <i class="fas fa-sort"></i></th>
+                                            <th data-sort="name" data-table="srv">Sigortalı Adı <i class="fas fa-sort"></i></th>
+                                            <th data-sort="phone" data-table="srv">Telefon <i class="fas fa-sort"></i></th>
+                                            <th data-sort="serviceType" data-table="srv">Hizmet Türü <i class="fas fa-sort"></i></th>
+                                            <th data-sort="provider" data-table="srv">Tedarikçi <i class="fas fa-sort"></i></th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="service-complaints-tbody">
+                                        <!-- Dynamic data -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination Container -->
+                            <div class="pagination-container" id="srv-pagination" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;"></div>
+                        </div>
+
+                        <!-- =========================
+                             TABLE 2: ÇAĞRI ŞİKAYETLERİ
+                             ========================= -->
+                        <div id="call-complaints-wrapper" class="table-section" style="padding: 25px;">
+                            <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; margin-bottom: 25px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <h3 style="font-size: 1.3rem; color: var(--primary-orange);"><i class="fas fa-phone"></i> İç Müşteri Çağrı Şikayetleri</h3>
+                                    <button class="btn-secondary export-excel-btn" data-export-type="call" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 12px; background: white;"><i class="fas fa-file-excel" style="color: #27ae60; font-size: 1.1rem;"></i> Tablo Olarak Al</button>
+                                </div>
+                                
+                                <!-- Call Stats -->
+                                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; margin-bottom: 0;">
+                                    <div class="stat-card" style="padding: 15px;">
+                                        <div class="stat-icon open" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-envelope-open-text"></i></div>
+                                        <div class="stat-info">
+                                            <h3 style="font-size: 0.85rem;">Açık</h3>
+                                            <h2 id="call-stat-open" style="font-size: 1.4rem;">0</h2>
+                                        </div>
+                                    </div>
+                                    <div class="stat-card" style="padding: 15px;">
+                                        <div class="stat-icon process" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-spinner"></i></div>
+                                        <div class="stat-info">
+                                            <h3 style="font-size: 0.85rem;">İşlemde</h3>
+                                            <h2 id="call-stat-process" style="font-size: 1.4rem;">0</h2>
+                                        </div>
+                                    </div>
+                                    <div class="stat-card" style="padding: 15px;">
+                                        <div class="stat-icon resolved" style="width: 40px; height: 40px; font-size: 1.2rem;"><i class="fas fa-check-circle"></i></div>
+                                        <div class="stat-info">
+                                            <h3 style="font-size: 0.85rem;">Çözümlenen</h3>
+                                            <h2 id="call-stat-resolved" style="font-size: 1.4rem;">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Call Filters -->
+                                <div class="filters-container modern-filters">
+                                    <select id="filter-call-status" class="filter-item"><option value="">Tüm Statüler</option></select>
+                                    <select id="filter-call-dept" class="filter-item"><option value="">Tüm Departmanlar</option></select>
+                                    <select id="filter-call-year" class="filter-item"><option value="">Tüm Yıllar</option><option value="2026">2026</option></select>
+                                    <select id="filter-call-month" class="filter-item"><option value="">Tüm Aylar</option><option value="01">Ocak</option><option value="02">Şubat</option><option value="03">Mart</option><option value="04">Nisan</option><option value="05">Mayıs</option><option value="06">Haziran</option><option value="07">Temmuz</option><option value="08">Ağustos</option><option value="09">Eylül</option><option value="10">Ekim</option><option value="11">Kasım</option><option value="12">Aralık</option></select>
+                                    <select id="filter-call-customer" class="filter-item"><option value="">Tüm Müşteriler</option></select>
+                                    <input type="text" id="filter-call-name" class="filter-item" placeholder="İsim Soyisim">
+                                    <input type="text" id="filter-call-phone" class="filter-item" placeholder="Telefon No">
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="call-complaints-table">
+                                    <thead>
+                                        <tr class="sortable-headers">
+                                            <th data-sort="id" data-table="call">Şikayet No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="status" data-table="call">Statü <i class="fas fa-sort"></i></th>
+                                            <th data-sort="department" data-table="call">Departman <i class="fas fa-sort"></i></th>
+                                            <th data-sort="date" data-table="call">Oluşturulma Tarihi <i class="fas fa-sort"></i></th>
+                                            <th data-sort="customer" data-table="call">Müşteri <i class="fas fa-sort"></i></th>
+                                            <th data-sort="name" data-table="call">İsim <i class="fas fa-sort"></i></th>
+                                            <th data-sort="phone" data-table="call">Telefon <i class="fas fa-sort"></i></th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="call-complaints-tbody">
+                                        <!-- Dynamic data -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination Container -->
+                            <div class="pagination-container" id="call-pagination" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Opinions View (Görüş Bekleyen İşler) -->
+        <div id="opinions-view" class="view hidden">
+            <!-- Sidebar (Duplicated for layout consistency, eventually should be componentized in a framework) -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <img src="ProjeLogo.jpg" alt="Logo" class="sidebar-logo">
+                </div>
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li id="nav-dashboard-opt"><a href="#" onclick="switchView('dashboard')"><i class="fas fa-home"></i> Ana Sayfa</a></li>
+                        <li id="nav-opinions-opt" class="active"><a href="#" onclick="switchView('opinions')"><i class="fas fa-inbox"></i> Görüş Bekleniyor <span id="opinions-badge-2" class="badge" style="background:#e74c3c; color:white; padding:2px 8px; border-radius:10px; font-size:0.75rem; margin-left:5px; display:none;">0</span></a></li>
+                        <li id="nav-reports-opt-internal" style="display:none;"><a href="#" onclick="switchView('reports-internal')"><i class="fas fa-chart-bar"></i> İç Raporlar</a></li>
+                        <li id="nav-reports-opt-external" style="display:none;"><a href="#" onclick="switchView('reports-external')"><i class="fas fa-globe"></i> Dış Raporlar</a></li>
+                    </ul>
+                </nav>
+                <div class="sidebar-footer">
+                    <div class="user-info">
+                        <div class="avatar"><i class="fas fa-user-circle"></i></div>
+                        <div class="user-details">
+                            <span class="user-name display-user-name-clone">Kullanıcı</span>
+                            <small class="user-meta display-user-dept-clone"><i class="fas fa-building"></i> Departman</small>
+                            <small class="user-meta display-user-role-clone"><i class="fas id-badge"></i> Pozisyon</small>
+                            <small class="user-meta display-user-mail-clone" style="display:none;"><i class="fas fa-envelope"></i> mail@eurocross.com</small>
+                            <button class="btn-logout-full logout-btn-clone" style="margin-top: 12px;"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <main class="main-content">
+                <header class="topbar"></header>
+                <div class="content-body">
+                    <div class="dashboard-header" style="margin-bottom: 30px;">
+                        <div>
+                            <h1>Görüş Bekleyen Talepler</h1>
+                            <p style="color: var(--text-muted); margin-top: 5px;">Sizin veya departmanınızın görüş bildirmesi gereken güncel dosyalar.</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-tables-container">
+                        <!-- TABLE 2.5: DIŞ MÜŞTERİ ŞİKAYETLERİ (Görüş Bekleyen) -->
+                        <div class="table-section mb-30" style="padding: 25px;">
+                            <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; margin-bottom: 25px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <h3 style="font-size: 1.3rem; color: #2980b9;"><i class="fas fa-briefcase"></i> Bekleyen Dış Müşteri Şikayetleri</h3>
+                                    <button class="btn-secondary export-excel-btn" data-export-type="opClient" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 12px; background: white;"><i class="fas fa-file-excel" style="color: #27ae60; font-size: 1.1rem;"></i> Tablo Olarak Al</button>
+                                </div>
+                                <div class="filters-container modern-filters">
+                                    <input type="text" id="filter-op-client-name" class="filter-item" placeholder="İsim Soyisim">
+                                    <input type="text" id="filter-op-client-policy" class="filter-item" placeholder="Poliçe No">
+                                    <select id="filter-op-client-customer" class="filter-item"><option value="">Tüm Kurumlar</option></select>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="opinions-client-table">
+                                    <thead>
+                                        <tr class="sortable-headers">
+                                            <th data-sort="id" data-table="opClient">Şikayet No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="date" data-table="opClient">Tarih <i class="fas fa-sort"></i></th>
+                                            <th data-sort="department" data-table="opClient">Kaynak <i class="fas fa-sort"></i></th>
+                                            <th data-sort="customer" data-table="opClient">Kurum <i class="fas fa-sort"></i></th>
+                                            <th data-sort="policyNo" data-table="opClient">Poliçe No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="name" data-table="opClient">İsim <i class="fas fa-sort"></i></th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="opinions-client-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-container" id="op-client-pagination" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;"></div>
+                        </div>
+
+                        <!-- TABLE 1: HİZMET ŞİKAYETLERİ (Görüş Bekleyen) -->
+                        <div class="table-section mb-30" style="padding: 25px;">
+                            <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; margin-bottom: 25px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <h3 style="font-size: 1.3rem; color: var(--primary-orange);"><i class="fas fa-hammer"></i> Bekleyen İç Müşteri Hizmet Şikayetleri</h3>
+                                    <button class="btn-secondary export-excel-btn" data-export-type="opSrv" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 12px; background: white;"><i class="fas fa-file-excel" style="color: #27ae60; font-size: 1.1rem;"></i> Tablo Olarak Al</button>
+                                </div>
+                                
+                                <div class="filters-container modern-filters">
+                                    <input type="text" id="filter-op-srv-ts" class="filter-item" placeholder="Dosya No (TS...)">
+                                    <input type="text" id="filter-op-srv-name" class="filter-item" placeholder="Sigortalı Adı">
+                                    <select id="filter-op-srv-customer" class="filter-item"><option value="">Tüm Müşteriler</option></select>
+                                    <select id="filter-op-srv-type" class="filter-item"><option value="">Tüm Hizmet Türleri</option></select>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="opinions-service-table">
+                                    <thead>
+                                        <tr class="sortable-headers">
+                                            <th data-sort="id" data-table="opSrv">Şikayet No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="caseDate" data-table="opSrv">Açılış Tarihi <i class="fas fa-sort"></i></th>
+                                            <th data-sort="tsNumber" data-table="opSrv">Dosya No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="department" data-table="opSrv">Kaynak <i class="fas fa-sort"></i></th>
+                                            <th data-sort="customer" data-table="opSrv">Müşteri <i class="fas fa-sort"></i></th>
+                                            <th data-sort="name" data-table="opSrv">Sigortalı Adı <i class="fas fa-sort"></i></th>
+                                            <th data-sort="serviceType" data-table="opSrv">Hizmet Türü <i class="fas fa-sort"></i></th>
+                                            <th data-sort="provider" data-table="opSrv">Tedarikçi <i class="fas fa-sort"></i></th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="opinions-service-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-container" id="op-srv-pagination" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;"></div>
+                        </div>
+
+                        <!-- TABLE 2: ÇAĞRI ŞİKAYETLERİ (Görüş Bekleyen) -->
+                        <div class="table-section mb-30" style="padding: 25px;">
+                            <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; margin-bottom: 25px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <h3 style="font-size: 1.3rem; color: var(--primary-orange);"><i class="fas fa-phone"></i> Bekleyen İç Müşteri Çağrı Şikayetleri</h3>
+                                    <button class="btn-secondary export-excel-btn" data-export-type="opCall" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 12px; background: white;"><i class="fas fa-file-excel" style="color: #27ae60; font-size: 1.1rem;"></i> Tablo Olarak Al</button>
+                                </div>
+                                
+                                <div class="filters-container modern-filters">
+                                    <input type="text" id="filter-op-call-name" class="filter-item" placeholder="İsim Soyisim">
+                                    <input type="text" id="filter-op-call-phone" class="filter-item" placeholder="Telefon No">
+                                    <select id="filter-op-call-customer" class="filter-item"><option value="">Tüm Müşteriler</option></select>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="opinions-call-table">
+                                    <thead>
+                                        <tr class="sortable-headers">
+                                            <th data-sort="id" data-table="opCall">Şikayet No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="date" data-table="opCall">Tarih <i class="fas fa-sort"></i></th>
+                                            <th data-sort="department" data-table="opCall">Kaynak <i class="fas fa-sort"></i></th>
+                                            <th data-sort="customer" data-table="opCall">Müşteri <i class="fas fa-sort"></i></th>
+                                            <th data-sort="name" data-table="opCall">İsim <i class="fas fa-sort"></i></th>
+                                            <th data-sort="phone" data-table="opCall">Telefon <i class="fas fa-sort"></i></th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="opinions-call-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-container" id="op-call-pagination" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;"></div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-header" style="margin-bottom: 20px; margin-top: 50px;">
+                        <div>
+                            <h1>Cevaplanan Görüş Talepleri (Geçmiş)</h1>
+                            <p style="color: var(--text-muted); margin-top: 5px;">Daha önce görüş bildirdiğiniz dosyalar.</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-tables-container">
+                        <!-- TABLE 4.5: DIŞ MÜŞTERİ ŞİKAYETLERİ (Tamamlanan) -->
+                        <div class="table-section mb-30" style="padding: 25px;">
+                            <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; margin-bottom: 25px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <h3 style="font-size: 1.3rem; color: #2980b9;"><i class="fas fa-briefcase"></i> Cevaplanan Dış Müşteri Şikayetleri</h3>
+                                    <button class="btn-secondary export-excel-btn" data-export-type="opDoneClient" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 12px; background: white;"><i class="fas fa-file-excel" style="color: #27ae60; font-size: 1.1rem;"></i> Tablo Olarak Al</button>
+                                </div>
+                                <div class="filters-container modern-filters">
+                                    <input type="text" id="filter-op-done-client-name" class="filter-item" placeholder="İsim">
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="opinions-done-client-table">
+                                    <thead>
+                                        <tr class="sortable-headers">
+                                            <th data-sort="id" data-table="opDoneClient">Şikayet No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="date" data-table="opDoneClient">Tarih <i class="fas fa-sort"></i></th>
+                                            <th data-sort="customer" data-table="opDoneClient">Kurum <i class="fas fa-sort"></i></th>
+                                            <th data-sort="name" data-table="opDoneClient">İsim <i class="fas fa-sort"></i></th>
+                                            <th data-sort="policyNo" data-table="opDoneClient">Poliçe No <i class="fas fa-sort"></i></th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="opinions-done-client-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-container" id="op-done-client-pagination" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;"></div>
+                        </div>
+
+                        <!-- TABLE 3: HİZMET ŞİKAYETLERİ (Tamamlanan) -->
+                        <div class="table-section mb-30" style="padding: 25px;">
+                            <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; margin-bottom: 25px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <h3 style="font-size: 1.3rem; color: #27ae60;"><i class="fas fa-hammer"></i> Cevaplanan İç Müşteri Hizmet Şikayetleri</h3>
+                                    <button class="btn-secondary export-excel-btn" data-export-type="opDoneSrv" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 12px; background: white;"><i class="fas fa-file-excel" style="color: #27ae60; font-size: 1.1rem;"></i> Tablo Olarak Al</button>
+                                </div>
+                                <div class="filters-container modern-filters">
+                                    <input type="text" id="filter-op-done-srv-ts" class="filter-item" placeholder="Dosya No">
+                                    <input type="text" id="filter-op-done-srv-name" class="filter-item" placeholder="Sigortalı">
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="opinions-done-service-table">
+                                    <thead>
+                                        <tr class="sortable-headers">
+                                            <th data-sort="id" data-table="opDoneSrv">Şikayet No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="caseDate" data-table="opDoneSrv">Açılış Tarihi <i class="fas fa-sort"></i></th>
+                                            <th data-sort="tsNumber" data-table="opDoneSrv">Dosya No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="customer" data-table="opDoneSrv">Müşteri <i class="fas fa-sort"></i></th>
+                                            <th data-sort="name" data-table="opDoneSrv">Sigortalı Adı <i class="fas fa-sort"></i></th>
+                                            <th data-sort="serviceType" data-table="opDoneSrv">Hizmet Türü <i class="fas fa-sort"></i></th>
+                                            <th data-sort="provider" data-table="opDoneSrv">Tedarikçi <i class="fas fa-sort"></i></th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="opinions-done-service-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-container" id="op-done-srv-pagination" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;"></div>
+                        </div>
+
+                        <!-- TABLE 4: ÇAĞRI ŞİKAYETLERİ (Tamamlanan) -->
+                        <div class="table-section mb-30" style="padding: 25px;">
+                            <div class="table-header" style="flex-direction: column; align-items: flex-start; gap: 20px; border-bottom: 1px solid rgba(0,0,0,0.05); padding-bottom: 20px; margin-bottom: 25px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <h3 style="font-size: 1.3rem; color: #27ae60;"><i class="fas fa-phone"></i> Cevaplanan İç Müşteri Çağrı Şikayetleri</h3>
+                                    <button class="btn-secondary export-excel-btn" data-export-type="opDoneCall" style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem; padding: 6px 12px; background: white;"><i class="fas fa-file-excel" style="color: #27ae60; font-size: 1.1rem;"></i> Tablo Olarak Al</button>
+                                </div>
+                                <div class="filters-container modern-filters">
+                                    <input type="text" id="filter-op-done-call-name" class="filter-item" placeholder="İsim">
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="opinions-done-call-table">
+                                    <thead>
+                                        <tr class="sortable-headers">
+                                            <th data-sort="id" data-table="opDoneCall">Şikayet No <i class="fas fa-sort"></i></th>
+                                            <th data-sort="date" data-table="opDoneCall">Tarih <i class="fas fa-sort"></i></th>
+                                            <th data-sort="customer" data-table="opDoneCall">Müşteri <i class="fas fa-sort"></i></th>
+                                            <th data-sort="name" data-table="opDoneCall">İsim <i class="fas fa-sort"></i></th>
+                                            <th data-sort="phone" data-table="opDoneCall">Telefon <i class="fas fa-sort"></i></th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="opinions-done-call-tbody"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination-container" id="op-done-call-pagination" style="display: flex; gap: 8px; justify-content: center; margin-top: 20px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Reports View (Raporlar) -->
+        <div id="reports-view" class="view hidden">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <img src="ProjeLogo.jpg" alt="Logo" class="sidebar-logo">
+                </div>
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li id="nav-dashboard-opt-3"><a href="#" onclick="switchView('dashboard')"><i class="fas fa-home"></i> Ana Sayfa</a></li>
+                        <li id="nav-opinions-opt-3"><a href="#" onclick="switchView('opinions')"><i class="fas fa-inbox"></i> Görüş Bekleniyor <span id="opinions-badge-3" class="badge" style="background:#e74c3c; color:white; padding:2px 8px; border-radius:10px; font-size:0.75rem; margin-left:5px; display:none;">0</span></a></li>
+                        <li id="nav-reports-opt-3-internal" style="display:none;"><a href="#" onclick="switchView('reports-internal')"><i class="fas fa-chart-bar"></i> İç Raporlar</a></li>
+                        <li id="nav-reports-opt-3-external" style="display:none;"><a href="#" onclick="switchView('reports-external')"><i class="fas fa-globe"></i> Dış Raporlar</a></li>
+                    </ul>
+                </nav>
+                <div class="sidebar-footer">
+                    <div class="user-info">
+                        <div class="avatar"><i class="fas fa-user-circle"></i></div>
+                        <div class="user-details">
+                            <span class="user-name display-user-name-clone">Kullanıcı</span>
+                            <small class="user-meta display-user-dept-clone"><i class="fas fa-building"></i> Departman</small>
+                            <small class="user-meta display-user-role-clone"><i class="fas id-badge"></i> Pozisyon</small>
+                            <small class="user-meta display-user-mail-clone" style="display:none;"><i class="fas fa-envelope"></i> mail@eurocross.com</small>
+                            <button class="btn-logout-full logout-btn-clone" style="margin-top: 12px;"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+            <main class="main-content">
+                <header class="topbar"></header>
+                <div class="content-body" style="background:var(--bg-light);">
+                    <div class="report-header-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                        <div>
+                            <h2 style="font-size: 1.8rem; color: var(--primary-dark); font-weight: 700;" id="reports-header-title">İç Raporlar</h2>
+                            <p style="color: var(--text-muted); margin-top: 5px;" id="reports-header-desc">Şikayet yönetimi analizleri ve departman performans metrikleri.</p>
+                        </div>
+                        <div class="report-export-buttons" style="display: flex; gap: 10px; align-items: center;">
+                            <button class="btn-secondary export-excel-btn" data-export-type="matrixReport" style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem; padding: 10px 18px; background: white; border: 1px solid #27ae60; color: #27ae60;">
+                                <i class="fas fa-file-excel" style="font-size: 1.2rem;"></i> Tablo Olarak Al
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Global Filters for Reports -->
+                    <div class="filters-container modern-filters" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 25px;">
+                        <select id="filter-rep-dept" class="filter-item" style="display: none;"><option value="">Tüm Departmanlar</option></select>
+                        <select id="filter-rep-type" class="filter-item"><option value="">Tüm Şikayet Türleri</option><option value="Dış Müşteri Şikayeti">Dış Müşteri Şikayetleri</option><option value="İç Müşteri Hizmet Şikayeti">İç Müşteri Hizmet Şikayetleri</option><option value="İç Müşteri Çağrı Şikayeti">İç Müşteri Çağrı Şikayetleri</option></select>
+                        <select id="filter-rep-status" class="filter-item"><option value="">Tüm Statüler</option></select>
+                        <select id="filter-rep-year" class="filter-item"><option value="">Tüm Yıllar</option><option value="2026">2026</option></select>
+                        <select id="filter-rep-month" class="filter-item"><option value="">Tüm Aylar</option><option value="01">Ocak</option><option value="02">Şubat</option><option value="03">Mart</option><option value="04">Nisan</option><option value="05">Mayıs</option><option value="06">Haziran</option><option value="07">Temmuz</option><option value="08">Ağustos</option><option value="09">Eylül</option><option value="10">Ekim</option><option value="11">Kasım</option><option value="12">Aralık</option></select>
+                        <select id="filter-rep-customer" class="filter-item"><option value="">Tüm Müşteriler</option></select>
+                        <select id="filter-rep-srvtype" class="filter-item"><option value="">Tüm Hizmet Türleri</option></select>
+                        <select id="filter-rep-provider" class="filter-item"><option value="">Tüm Tedarikçiler</option></select>
+                        <select id="filter-rep-verdict" class="filter-item"><option value="">Tüm Sonuçlar (Haklı/Haksız)</option><option value="Haklı">Haklı/Şirket Hatası</option><option value="Haksız">Haksız/Sigortalı Haksız</option></select>
+                        <button id="btn-reset-filters" class="btn-primary" style="padding: 10px 15px; background: #7f8c8d; border: none; font-size: 0.9rem;"><i class="fas fa-sync-alt"></i> Filtreleri Sıfırla</button>
+                    </div>
+
+                    <!-- KPI Cards Setup -->
+                    <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">
+                        <div class="stat-card" style="padding: 20px; text-align: center;">
+                            <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">Açılan Şikayet</h3>
+                            <h2 id="rep-total-complaints" style="font-size: 1.8rem; color: var(--text-dark);">0</h2>
+                        </div>
+                        <div class="stat-card" style="padding: 20px; text-align: center;">
+                            <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">Açık Şikayet</h3>
+                            <h2 id="rep-open-complaints" style="font-size: 1.8rem; color: #f39c12;">0</h2>
+                        </div>
+                        <div class="stat-card" style="padding: 20px; text-align: center;">
+                            <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">İşlemde Şikayet</h3>
+                            <h2 id="rep-process-complaints" style="font-size: 1.8rem; color: #2980b9;">0</h2>
+                        </div>
+                        <div class="stat-card" style="padding: 20px; text-align: center;">
+                            <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">Çözümlenen Şikayet</h3>
+                            <h2 id="rep-resolved-complaints" style="font-size: 1.8rem; color: #27ae60;">0</h2>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid" style="grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 30px;">
+                        <div class="stat-card" style="padding: 20px; text-align: center; border-left: 4px solid var(--primary-orange);">
+                            <h3 style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">Sorumlu Tutulan Dosya</h3>
+                            <h2 id="rep-responsible-complaints" style="font-size: 1.5rem; color: var(--text-dark);">0</h2>
+                        </div>
+                        <div class="stat-card" style="padding: 20px; text-align: center; border-bottom: 4px solid #e74c3c;">
+                            <h3 style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">Haklı (Müşteri) Oranı</h3>
+                            <h2 id="rep-justified-rate" style="font-size: 1.5rem; color: #e74c3c;">%0</h2>
+                        </div>
+                        <div class="stat-card" style="padding: 20px; text-align: center; border-bottom: 4px solid #27ae60;">
+                            <h3 style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;">Haksız (Müşteri) Oranı</h3>
+                            <h2 id="rep-unjustified-rate" style="font-size: 1.5rem; color: #27ae60;">%0</h2>
+                        </div>
+                        <div class="stat-card" style="padding: 20px; text-align: center;">
+                            <h3 style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;"><i class="fas fa-stopwatch"></i> Ort. Çözüm Süresi</h3>
+                            <h2 id="rep-avg-resolve-time" style="font-size: 1.3rem; color: var(--text-dark);">00:00:00</h2>
+                        </div>
+                        <div class="stat-card" style="padding: 20px; text-align: center;">
+                            <h3 style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;"><i class="fas fa-clock"></i> Ort. Görüş Süresi</h3>
+                            <h2 id="rep-avg-opinion-time" style="font-size: 1.3rem; color: var(--text-dark);">00:00:00</h2>
+                        </div>
+                        <div class="stat-card" style="padding: 20px; text-align: center;">
+                            <h3 style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 5px;"><i class="fas fa-bolt"></i> Karşılama Süresi</h3>
+                            <h2 id="rep-avg-response-time" style="font-size: 1.3rem; color: var(--text-dark);">00:00:00</h2>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid Setup -->
+                    <div class="chart-matrix-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 40px;">
+                        <!-- Time Series 1 -->
+                        <div id="wrapper-monthly-opened" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Ay Bazlı Açılan Şikayet Trendi</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-monthly-opened"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix 1 -->
+                        <div id="wrapper-matrix-opened" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Departman Bazlı Açılan Şikayet Sayıları</h3>
+                            <table class="data-table" id="matrix-opened-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Departman</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Time Series 2 -->
+                        <div id="wrapper-monthly-responsible" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Ay Bazlı Sorumlu Olunan Dosya Trendi</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-monthly-responsible"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix 2 -->
+                        <div id="wrapper-matrix-responsible" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Departman Bazlı Sorumlu Olunan Dosya Sayıları</h3>
+                            <table class="data-table" id="matrix-responsible-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Departman</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Time Series: Resolve Time -->
+                        <div id="wrapper-monthly-resolve-time" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Ay Bazlı Ort. Çözüm Süresi Trendi (Saat)</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-monthly-resolve-time"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- NEW Matrix: Resolve Time -->
+                        <div id="wrapper-matrix-resolve-time" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Departman Bazlı Aylık Ort. Çözüm Süresi</h3>
+                            <table class="data-table" id="matrix-resolve-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Departman</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Ortalama</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Time Series: Opinion Time -->
+                        <div id="wrapper-monthly-opinion-time" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Ay Bazlı Ort. Görüş Süresi Trendi (Saat)</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-monthly-opinion-time"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- NEW Matrix: Opinion Time -->
+                        <div id="wrapper-matrix-opinion-time" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Departman Bazlı Aylık Ort. Görüş Süresi</h3>
+                            <table class="data-table" id="matrix-opinion-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Departman</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Ortalama</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Categorical Pies -->
+                        <div id="wrapper-customer-pie" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Müşteri Dağılımı</h3>
+                            <div style="position: relative; height: 350px; width: 100%;">
+                                <canvas id="chart-customer-pie"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix: Customer Dist -->
+                        <div id="wrapper-matrix-customer" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Müşteri Adı ve Aylık Şikayet Sayısı</h3>
+                            <table class="data-table" id="matrix-customer-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Müşteri Adı</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <div id="wrapper-type-pie" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Şikayet Türü Dağılımı</h3>
+                            <div style="position: relative; height: 350px; width: 100%;">
+                                <canvas id="chart-type-pie"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix: Type Dist -->
+                        <div id="wrapper-matrix-type" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Şikayet Türü ve Aylık Dağılım</h3>
+                            <table class="data-table" id="matrix-type-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Şikayet Türü</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Reason Pie -->
+                        <div id="wrapper-reason-pie" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Şikayet Sebebi Dağılımı</h3>
+                            <div style="position: relative; height: 350px; width: 100%;">
+                                <canvas id="chart-reason-pie"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix: Reason Dist -->
+                        <div id="wrapper-matrix-reason" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Şikayet Sebebi ve Aylık Dağılım</h3>
+                            <table class="data-table" id="matrix-reason-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Şikayet Sebebi</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Service Type specific Pie -->
+                        <div id="chart-wrapper-srvtype" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Hizmet Türü Dağılımı</h3>
+                            <div style="position: relative; height: 350px; width: 100%;">
+                                <canvas id="chart-srvtype-pie"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix: Service Type Dist -->
+                        <div id="wrapper-matrix-srvtype" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Hizmet Türü ve Aylık Dağılım</h3>
+                            <table class="data-table" id="matrix-srvtype-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Hizmet Türü</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Closer Performance Line Chart -->
+                        <div id="wrapper-monthly-closer" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Ay Bazlı Dosya Sonuçlandıran Kişi Performansı</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-monthly-closer"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix: Closer Performance -->
+                        <div id="wrapper-matrix-closer" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Yetkili Bazlı Dosya Sonuçlandırma Sayıları</h3>
+                            <table class="data-table" id="matrix-closer-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Yetkili Kişi</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Response Time Line Chart -->
+                        <div id="wrapper-monthly-response-time" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Ay Bazlı Ort. Karşılama Süresi Trendi (Saat)</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-monthly-response-time"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix: Response Time -->
+                        <div id="wrapper-matrix-response-time" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Yetkili Bazlı Aylık Ort. Karşılama Süresi</h3>
+                            <table class="data-table" id="matrix-response-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Yetkili Kişi</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Ortalama</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- NEW: Day Trend Chart -->
+                        <div id="wrapper-trend-day-chart" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Güne Göre Şikayet Trendi</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-trend-day"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix: Day Trend -->
+                        <div id="wrapper-matrix-day" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Gün Bazlı Açılan Şikayet Sayıları</h3>
+                            <table class="data-table" id="matrix-day-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Gün</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- NEW: Hour Trend Chart -->
+                        <div id="wrapper-trend-hour-chart" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Saate Göre Şikayet Trendi</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-trend-hour"></canvas>
+                            </div>
+                        </div>
+                        <!-- NEW Matrix: Hour Trend -->
+                        <div id="wrapper-matrix-hour" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Saat Bazlı Açılan Şikayet Sayıları</h3>
+                            <table class="data-table" id="matrix-hour-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Saat Aralığı</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Author Distribution Table -->
+                        <div id="wrapper-author-table" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Şikayet Açan Kişi Dağılımı</h3>
+                            <div style="position: relative; height: 300px; width: 100%; overflow-y: auto; overflow-x: hidden;">
+                                <div id="rep-author-table-list" style="font-size: 0.9rem;"></div>
+                            </div>
+                            <div id="rep-author-pagination" style="display: flex; gap: 5px; margin-top: 15px; justify-content: center;"></div>
+                        </div>
+
+                        <!-- Provider Distribution Table -->
+                        <div id="wrapper-provider-bar" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Tedarikçi Dağılımı</h3>
+                            <div style="position: relative; height: 300px; width: 100%; overflow-y: auto; overflow-x: hidden;">
+                                <div id="rep-provider-table-list" style="font-size: 0.9rem;"></div>
+                            </div>
+                            <div id="rep-provider-pagination" style="display: flex; gap: 5px; margin-top: 15px; justify-content: center;"></div>
+                        </div>
+
+                        <div id="wrapper-location-map" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); grid-column: span 2;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; text-align: center; color: var(--text-dark);">İllere Göre Dağılım</h3>
+                            <div style="position: relative; height: 350px; width: 100%;">
+                                <div id="chart-location-map" style="width: 100%; height: 100%;"></div>
+                            </div>
+                            <div style="display: flex; gap: 20px; margin-top: 15px;">
+                                <div style="flex:1; border: 1px solid #eee; border-radius: 8px; overflow: hidden;">
+                                    <div style="display:flex; justify-content:space-between; background:#f8f9fa; padding:10px; border-bottom:1px solid #eee; font-weight:bold; font-size: 0.9rem;"><span>İl</span><span>Dosya Sayısı</span></div>
+                                    <div id="map-city-list" style="max-height: 200px; overflow-y: auto; font-size: 0.9rem;"></div>
+                                </div>
+                                <div style="flex:1; border: 1px solid #eee; border-radius: 8px; overflow: hidden;">
+                                    <div style="display:flex; justify-content:space-between; background:#f8f9fa; padding:10px; border-bottom:1px solid #eee; font-weight:bold; font-size: 0.9rem;"><span>Bölge</span><span>Dosya Sayısı</span></div>
+                                    <div id="map-region-list" style="max-height: 200px; overflow-y: auto; font-size: 0.9rem;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Complaint Form Modal -->
+        <div id="complaint-modal" class="modal hidden">
+            <div class="modal-content glass-panel" style="max-width: 850px; max-height: 90vh; overflow-y: auto; padding: 0;">
+                <div class="modal-header" style="position: sticky; top: 0; background: white; z-index: 10; padding: 20px 30px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0; font-size: 1.5rem; color: var(--primary-orange);"><i class="fas fa-edit"></i> Yeni Şikayet Kaydı Oluştur</h2>
+                    <button id="close-complaint-modal" class="btn-icon" style="font-size: 1.5rem; color: var(--text-muted);"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <div class="modal-body" style="padding: 25px 30px;">
+                    <div class="form-container">
+                        <form id="create-complaint-form">
+                            <!-- Section 1: Common Type Selectors -->
+                            <div class="form-section">
+                                <h3 class="section-title">Temel Bilgiler</h3>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="comp-type">Şikayet Türü <span class="required">*</span></label>
+                                        <select id="comp-type">
+                                            <option value="">Seçiniz...</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="comp-reason">Şikayet Sebebi <span class="required">*</span></label>
+                                        <select id="comp-reason" disabled>
+                                            <option value="">Önce tür seçiniz...</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section: Client Complaint Fields (Dış Müşteriler İçin Ortak Form) -->
+                            <div id="client-complaint-section" class="form-section hidden">
+                                <h3 class="section-title">Şikayet Detayları</h3>
+                                <div class="form-grid">
+                                    <div class="form-group full-width">
+                                        <label>Müşteri</label>
+                                        <input type="text" id="client-customer" readonly class="readonly-input" style="font-weight: bold;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="client-name">İsim Soyisim <span class="required">*</span></label>
+                                        <input type="text" id="client-name" placeholder="Örn: Ali Yılmaz">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="client-phone">Telefon No <span class="required">*</span></label>
+                                        <input type="tel" id="client-phone" placeholder="Örn: 0555...">
+                                    </div>
+                                    <div class="form-group" id="client-incident-date-wrapper" style="display: none;">
+                                        <label for="client-incident-date">Şikayetin Yaşandığı Tarih ve Saat <span class="required">*</span></label>
+                                        <input type="datetime-local" id="client-incident-date">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="client-policy-no">Poliçe No <span class="required">*</span></label>
+                                        <input type="text" id="client-policy-no" placeholder="Örn: 123456789" style="border: 1px solid var(--primary-orange);">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="client-complaint-text">Şikayet Detayı <span class="required">*</span></label>
+                                        <textarea id="client-complaint-text" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="client-op-note">Müşteri Temsilcisi Notu</label>
+                                        <textarea id="client-op-note" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2: Call Complaint Fields (Çağrı Şikayeti - İç Kullanıcı) -->
+                            <div id="call-complaint-section" class="form-section hidden">
+                                <h3 class="section-title">Çağrı Şikayeti Detayları</h3>
+                                <div class="form-grid">
+                                    <div class="form-group full-width">
+                                        <label for="call-customer">Müşteri <span class="required">*</span></label>
+                                        <select id="call-customer">
+                                            <option value="">Seçiniz...</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="call-name">İsim Soyisim <span class="required">*</span></label>
+                                        <input type="text" id="call-name" placeholder="Örn: Ali Yılmaz">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="call-phone">Telefon No <span class="required">*</span></label>
+                                        <input type="tel" id="call-phone" placeholder="Örn: 0555...">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="call-incident-date">Şikayetin Yaşandığı Tarih ve Saat <span class="required">*</span></label>
+                                        <input type="datetime-local" id="call-incident-date">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="call-assist-file">Asistans Dosya No</label>
+                                        <input type="text" id="call-assist-file">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="call-damage-file">Hasar Dosya No</label>
+                                        <input type="text" id="call-damage-file">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="call-complaint-text">Sigortalının Şikayeti <span class="required">*</span></label>
+                                        <textarea id="call-complaint-text" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="call-op-note">Operasyonun Notu</label>
+                                        <textarea id="call-op-note" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 3: Service Complaint Fields (Hizmet Şikayeti) -->
+                            <div id="service-complaint-section" class="form-section hidden">
+                                <h3 class="section-title">Hizmet Şikayeti Detayları (Dosya Sorgulama)</h3>
+                                <div class="form-grid">
+                                    <div class="form-group full-width search-group">
+                                        <label for="service-search-ts">Dosya No (TS...)</label>
+                                        <div class="search-input-wrapper">
+                                            <input type="text" id="service-search-ts" placeholder="Örn: TS24000001">
+                                            <button type="button" id="service-search-btn" class="btn-primary"><i class="fas fa-search"></i> Sorgula</button>
+                                        </div>
+                                        <small id="service-search-status" class="status-msg"></small>
+                                    </div>
+                                    
+                                    <!-- Auto-filled readonly block -->
+                                    <div class="form-group">
+                                        <label>Hizmet No</label>
+                                        <input type="text" id="srv-case-no" readonly class="readonly-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Dosya Açılış Tarihi</label>
+                                        <input type="text" id="srv-date" readonly class="readonly-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Müşteri</label>
+                                        <input type="text" id="srv-customer" readonly class="readonly-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>İsim</label>
+                                        <input type="text" id="srv-name" readonly class="readonly-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Lokasyon</label>
+                                        <input type="text" id="srv-location" readonly class="readonly-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hizmet Türü</label>
+                                        <input type="text" id="srv-type" readonly class="readonly-input">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label>Tedarikçi</label>
+                                        <input type="text" id="srv-provider" readonly class="readonly-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="srv-phone">Telefon No <span class="required">*</span></label>
+                                        <input type="tel" id="srv-phone" placeholder="Örn: 0555...">
+                                    </div>
+
+                                    <div class="form-group full-width">
+                                        <label for="srv-complaint-text">Sigortalı Şikayeti <span class="required">*</span></label>
+                                        <textarea id="srv-complaint-text" rows="3"></textarea>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label for="srv-op-note">Operasyon Notu</label>
+                                        <textarea id="srv-op-note" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 4: Attachments and Submit -->
+                            <div class="form-section form-actions">
+                                <div class="file-upload-block">
+                                    <label for="complaint-doc" class="btn-secondary">
+                                        <i class="fas fa-paperclip"></i> Evrak Ekle
+                                    </label>
+                                    <input type="file" id="complaint-doc" class="hidden" multiple>
+                                    <div id="attached-files-list"></div>
+                                </div>
+                                <button type="button" id="save-complaint-btn" class="btn-primary btn-lg" disabled>
+                                    <i class="fas fa-save"></i> Şikayeti Kaydet
+                                </button>
+                            </div>
+
+                            <!-- Section 5: Activity Log Container (Empty on initial creation) -->
+                            <div class="form-section log-section">
+                                <h4>Aktivite Logu</h4>
+                                <ul id="complaint-logs" class="log-list">
+                                    <li class="log-info">Kayıt oluşturmayı bekliyor...</li>
+                                </ul>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Modal -->
+        <div id="welcome-modal" class="modal hidden">
+            <div class="modal-content glass-panel">
+                <div class="modal-header">
+                    <h2>Hoş Geldiniz</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Eurocross Çözüm Merkezi'ne hoş geldiniz. Kurumsal gelişimimizin temelinde yatan geri
+                        bildirimleriniz, hizmet kalitemizi artırma vizyonumuzun en önemli parçasıdır. Süreçlerimizi
+                        mükemmelleştirmek ve sizlere daha iyi bir deneyim sunmak amacıyla; ileteceğiniz tüm bildirimler
+                        uzman ekiplerimiz tarafından şeffaflık ve hız ilkeleri doğrultusunda çözüme ulaştırılacaktır.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="dont-show-again">
+                        <label for="dont-show-again"> Bir daha gösterme</label>
+                    </div>
+                    <button id="welcome-ok-btn" class="btn-primary">Tamam</button>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <!-- Notification Modal -->
+        <div id="notification-modal" class="modal hidden">
+            <div class="modal-content glass-panel" style="max-width: 400px; text-align: center;">
+                <div class="modal-header" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
+                    <div id="notification-icon" style="font-size: 3.5rem; margin-bottom: 15px; color: #2ecc71;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                </div>
+                <div class="modal-body" style="margin-bottom: 25px;">
+                    <h3 id="notification-title" style="margin-bottom: 12px; color: var(--text-dark); font-size: 1.3rem;">Başarılı</h3>
+                    <p id="notification-message" style="color: var(--text-muted); font-size: 1rem;">İşleminiz başarıyla gerçekleşti.</p>
+                </div>
+                <div class="modal-footer" style="justify-content: center; border-top: none;">
+                    <button id="close-notification-btn" class="btn-primary" style="padding: 10px 40px; font-size: 1.05rem;">Tamam</button>
+                </div>
+            </div>
+        </div>
+        <!-- Confirm Modal -->
+        <div id="confirm-modal" class="modal hidden" style="z-index: 2000;">
+            <div class="modal-content glass-panel" style="max-width: 450px; text-align: center;">
+                <div class="modal-header" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
+                    <div style="font-size: 3.5rem; margin-bottom: 15px; color: #f39c12;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                </div>
+                <div class="modal-body" style="margin-bottom: 25px;">
+                    <h3 id="confirm-title" style="margin-bottom: 12px; color: var(--text-dark); font-size: 1.3rem;">Dikkat</h3>
+                    <p id="confirm-message" style="color: var(--text-muted); font-size: 1rem;">Bu işleme devam etmek istiyor musunuz?</p>
+                </div>
+                <div class="modal-footer" style="justify-content: center; border-top: none; gap: 15px;">
+                    <button id="confirm-no-btn" class="btn-secondary" style="padding: 10px 30px; font-size: 1.05rem;">Hayır</button>
+                    <button id="confirm-yes-btn" class="btn-primary" style="padding: 10px 30px; font-size: 1.05rem; background: var(--primary-orange);">Evet</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opinion Request Modal (Görüş Al) -->
+        <div id="opinion-modal" class="modal hidden" style="z-index: 1060;">
+            <div class="modal-content glass-panel" style="max-width: 600px;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0;"><i class="fas fa-comments"></i> Departmandan Görüş İste</h2>
+                    <button id="close-opinion-modal" class="btn-icon"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="opinion-form">
+                        <div class="form-group">
+                            <label>İletilecek Departman <span class="required">*</span></label>
+                            <select id="opinion-dept-select" class="form-control" required>
+                                <option value="">Departman Seçiniz...</option>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group" id="opinion-admins-group" style="display: none;">
+                            <label>Görüş İstenecek Kişiler</label>
+                            <div id="opinion-admins-list" style="background: var(--bg-light); border: 1px solid rgba(0,0,0,0.1); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto;">
+                                <!-- Checkboxes populated dynamically -->
+                            </div>
+                            <small style="color: var(--text-muted); display: block; margin-top: 5px;">Seçili kişilere bildirim düşecektir. İlgilenmesini istemediğiniz kişilerin işaretini kaldırabilirsiniz.</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Görüş Talebi Detayı <span class="required">*</span></label>
+                            <textarea id="opinion-note" class="form-control" rows="4" placeholder="Lütfen istenen görüş ile ilgili detayları buraya giriniz..." required></textarea>
+                        </div>
+                        <div class="modal-footer" style="padding: 0; margin-top: 25px;">
+                            <button type="submit" class="btn-primary" style="width: 100%;"><i class="fas fa-paper-plane"></i> Talebi Gönder</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Opinion Answer Modal (Görüş Bildir) -->
+        <div id="opinion-answer-modal" class="modal hidden" style="z-index: 1060;">
+            <div class="modal-content glass-panel" style="max-width: 650px;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0;"><i class="fas fa-reply-all"></i> Departman Görüşü Bildir</h2>
+                    <button id="close-opinion-answer-modal" class="btn-icon"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div style="background: rgba(41, 128, 185, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(41, 128, 185, 0.2); margin-bottom: 20px;">
+                        <h4 style="font-size: 0.95rem; color: #2980b9; margin-bottom: 5px;">Gelen Talep:</h4>
+                        <p id="answer-request-note" style="font-size: 0.9rem; color: var(--text-dark); line-height: 1.5;">...</p>
+                        <small id="answer-request-meta" style="color: var(--text-muted); display: block; margin-top: 10px;">İsteyen: Yetkili - Tarih: 12.03.2025</small>
+                    </div>
+
+                    <form id="opinion-answer-form">
+                        <div class="form-group">
+                            <label>Hukuki / Departman Görüşünüz <span class="required">*</span></label>
+                            <textarea id="opinion-answer-note" class="form-control" rows="5" placeholder="Görüş ve notlarınızı buraya detaylıca yazınız..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Evrak / Kanıt Ekle (Opsiyonel)</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="opinion-answer-file" class="file-input" style="padding: 10px; border: 1px dashed var(--primary-gray); width: 100%; border-radius: 8px;">
+                            </div>
+                            <small style="color: var(--text-muted); display: block; margin-top: 5px;">PDF, PNG, JPG (Maks 1 Dosya, 2MB)</small>
+                        </div>
+
+                        <div class="modal-footer" style="padding: 0; margin-top: 25px;">
+                            <button type="submit" class="btn-primary" style="width: 100%; background: #27ae60;"><i class="fas fa-check-double"></i> Görüşü İlet</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conclude Complaint Modal (Şikayeti Sonuçlandır) -->
+        <div id="conclude-modal" class="modal hidden" style="z-index: 1060;">
+            <div class="modal-content glass-panel" style="max-width: 600px;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0;"><i class="fas fa-check-circle"></i> Şikayeti Sonuçlandır</h2>
+                    <button id="close-conclude-modal" class="btn-icon"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <form id="conclude-form">
+                        <div class="form-group">
+                            <label>Sorumlu Departman <span class="required">*</span></label>
+                            <select id="conclude-dept-select" class="form-control" required>
+                                <option value="">Departman Seçiniz...</option>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Şikayet Durumu (Sonuç) <span class="required">*</span></label>
+                            <select id="conclude-status-select" class="form-control" required onchange="this.style.color = this.value === 'Haklı' ? '#e74c3c' : (this.value === 'Haksız' ? '#27ae60' : 'var(--text-dark)'); this.style.fontWeight = '600';">
+                                <option value="" style="color: var(--text-dark);">Seçiniz...</option>
+                                <option value="Haklı" style="color: #e74c3c; font-weight: 600;">Haklı/Şirket Hatası</option>
+                                <option value="Haksız" style="color: #27ae60; font-weight: 600;">Haksız/Sigortalı Haksız</option>
+                            </select>
+                            <small id="conclude-status-hint" style="color: var(--text-muted); display: block; margin-top: 5px;">Haklı ise Kırmızı, Haksız ise Yeşil olarak algılanacaktır.</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Yetkili Notu / Sonuç Özeti <span class="required">*</span></label>
+                            <textarea id="conclude-note" class="form-control" rows="4" placeholder="Şikayetin sonucuna dair nihai raporunuzu ve özetinizi giriniz..." required></textarea>
+                        </div>
+
+                        <div class="modal-footer" style="padding: 0; margin-top: 25px;">
+                            <button type="submit" class="btn-primary" style="width: 100%;"><i class="fas fa-flag-checkered"></i> Dosyayı Kapat</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complaint Detail Modal -->
+        <div id="complaint-detail-modal" class="modal hidden">
+            <div class="modal-content glass-panel" style="max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 0;">
+                <div class="modal-header" style="position: sticky; top: 0; background: white; z-index: 10; padding: 20px 30px; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <h2 style="margin: 0; font-size: 1.3rem;"><i class="fas fa-file-alt"></i> Şikayet Dosyası: <span id="detail-complaint-id">CMP-XXXX</span></h2>
+                        <span id="detail-status-badge" class="status-badge status-open">Talep Açıldı</span>
+                    </div>
+                    <button id="close-detail-modal" class="btn-icon" style="font-size: 1.5rem; color: var(--text-muted);"><i class="fas fa-times"></i></button>
+                </div>
+
+                <div class="modal-body" style="padding: 25px 30px; background: #f8f9fa;">
+                    <!-- Summary Section -->
+                    <div class="table-section mb-30" style="padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                        <div class="table-header" style="margin-bottom: 15px;">
+                            <h3 style="font-size: 1.05rem;">Genel Bilgiler</h3>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <span style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 5px; display: block;">Şikayet Türü</span>
+                                <strong id="detail-type" style="font-size: 1.05rem; color: var(--text-dark);">...</strong>
+                            </div>
+                            <div class="form-group">
+                                <span style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 5px; display: block;">Şikayet Sebebi</span>
+                                <strong id="detail-reason" style="font-size: 1.05rem; color: var(--text-dark);">...</strong>
+                            </div>
+                            <div class="form-group" id="detail-author-wrapper">
+                                <span style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 5px; display: block;">Dosyayı Açan</span>
+                                <strong id="detail-author" style="font-size: 1.05rem; color: var(--text-dark);">...</strong>
+                            </div>
+                            <div class="form-group" id="detail-author-dept-wrapper">
+                                <span style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 5px; display: block;">Departman</span>
+                                <strong id="detail-author-dept" style="font-size: 1.05rem; color: var(--text-dark);">...</strong>
+                            </div>
+                            <div class="form-group" id="detail-responsible-wrapper">
+                                <span style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 5px; display: block;">Şikayet Sorumlusu</span>
+                                <strong id="detail-responsible" style="font-size: 1.05rem; color: var(--primary-orange);"><i class="fas fa-user-shield"></i> -</strong>
+                            </div>
+                            <div class="form-group" id="detail-verdict-wrapper" style="display: none; grid-column: 1 / -1; background: #fdfaf6; padding: 15px; border-radius: 8px; border: 1px solid #f1e2cd;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                    <div>
+                                        <span style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 5px; display: block;">Şikayet Sonucu</span>
+                                        <strong id="detail-verdict" style="font-size: 1.05rem; color: var(--text-dark);">...</strong>
+                                    </div>
+                                    <div>
+                                        <span style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 5px; display: block;">Sorumlu Departman</span>
+                                        <strong id="detail-conclusion-dept" style="font-size: 1.05rem; color: var(--text-dark);">...</strong>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 5px; display: block;">Girilen Sonuç Notu</span>
+                                    <div id="detail-conclusion-note" style="background: white; padding: 10px; border-radius: 6px; font-size: 0.95rem; line-height: 1.4; border: 1px solid rgba(0,0,0,0.05);">-</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <span style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 5px; display: block;">Oluşturulma Tarihi</span>
+                                <strong id="detail-date" style="font-size: 1.05rem; color: var(--text-dark);">...</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Data Section -->
+                    <div id="detail-authority-query-section" style="display: none; padding: 20px; background: #fff3cd; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px;">
+                        <h4 style="margin-top: 0; color: #856404; font-size: 0.95rem; margin-bottom: 15px;"><i class="fas fa-search"></i> Dosya Bilgisi Entegrasyonu (Sadece Yetkili)</h4>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="detail-ts-query-input" class="form-control" placeholder="Örn: TS24000001" style="max-width: 250px;">
+                            <button id="detail-ts-query-btn" class="btn-primary" style="background: #f39c12; border: none; padding: 8px 15px; border-radius: 6px;"><i class="fas fa-magic"></i> Dosya Verilerini Akıt</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-section mb-30" style="padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                        <div class="table-header" style="margin-bottom: 15px;">
+                            <h3 style="font-size: 1.05rem;">Dosya Detayları</h3>
+                        </div>
+                        <div id="detail-data-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <!-- Injected dynamically -->
+                        </div>
+                        
+                        <div style="margin-top: 25px;">
+                            <span style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 8px;">Müşteri/Sigortalı Şikayeti</span>
+                            <div id="detail-complaint-text" style="background: var(--white); padding: 15px; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; border: 1px solid rgba(0,0,0,0.05);">-</div>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <span style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 8px;">Operasyon Notu</span>
+                            <div id="detail-op-note" style="background: rgba(230, 148, 7, 0.05); border: 1px solid rgba(230, 148, 7, 0.2); padding: 15px; border-radius: 8px; font-size: 0.95rem; line-height: 1.5;">-</div>
+                        </div>
+                    </div>
+
+                    <!-- Opinion Display Section -->
+                    <div id="detail-opinions-section" class="table-section mb-30 hidden" style="padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); background: rgba(243, 156, 18, 0.02); border: 1px solid rgba(243, 156, 18, 0.1);">
+                        <div class="table-header" style="margin-bottom: 15px;">
+                            <h3 style="font-size: 1.05rem; color: #d35400;"><i class="fas fa-comments"></i> Departman Görüşleri</h3>
+                        </div>
+                        <div id="detail-opinions-list" style="display: flex; flex-direction: column; gap: 15px;">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Opinion Answer Form Section -->
+                    <div id="detail-opinion-form-section" class="table-section mb-30 hidden" style="padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); background: rgba(41, 128, 185, 0.05); border: 1px solid rgba(41, 128, 185, 0.2);">
+                        <div class="table-header" style="margin-bottom: 15px;">
+                            <h3 style="font-size: 1.05rem; color: #2980b9;"><i class="fas fa-reply-all"></i> Görüş Bildir</h3>
+                        </div>
+                        <form id="inline-opinion-answer-form">
+                            <div class="form-group">
+                                <label>Görüşünüz <span class="required">*</span></label>
+                                <textarea id="inline-opinion-answer-note" class="form-control" rows="4" placeholder="Görüş ve notlarınızı buraya detaylıca yazınız..." required></textarea>
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>Evrak / Kanıt Ekle (Opsiyonel)</label>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" id="inline-opinion-answer-file" class="file-input" style="padding: 10px; border: 1px dashed var(--primary-gray); width: 100%; border-radius: 8px;">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary" style="margin-top: 15px; background: #27ae60;"><i class="fas fa-paper-plane"></i> Görüşü Gönder</button>
+                        </form>
+                    </div>
+
+                    <!-- Action Buttons for Authority -->
+                    <div id="detail-action-buttons" class="table-section mb-30 hidden" style="padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); background: rgba(46, 204, 113, 0.02); border: 1px solid rgba(46, 204, 113, 0.1);">
+                        <div class="table-header" style="margin-bottom: 15px;">
+                            <h3 style="font-size: 1.05rem; color: #27ae60;"><i class="fas fa-bolt"></i> Şikayet İşlemleri (Yetkili)</h3>
+                        </div>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <button id="action-take-btn" class="status-badge" style="cursor:pointer; background:rgba(41,128,185,0.1); color:#2980b9; border:none; padding:10px 20px; font-size:1rem;"><i class="fas fa-hand-paper"></i> Şikayeti Al</button>
+                            <button id="action-release-btn" class="status-badge" style="cursor:pointer; background:rgba(231,76,60,0.1); color:#e74c3c; border:none; padding:10px 20px; font-size:1rem; display:none;"><i class="fas fa-hand-holding-water"></i> Şikayeti Bırak</button>
+                            <button id="action-request-btn" class="status-badge" style="cursor:pointer; background:rgba(243,156,18,0.1); color:#f39c12; border:none; padding:10px 20px; font-size:1rem;"><i class="fas fa-comments"></i> Departmandan Görüş Al</button>
+                            <button id="action-conclude-btn" class="status-badge" style="cursor:pointer; background:rgba(46,204,113,0.1); color:#27ae60; border:none; padding:10px 20px; font-size:1rem;"><i class="fas fa-check-circle"></i> Şikayeti Sonuçlandır</button>
+                            <button id="action-reopen-btn" class="status-badge" style="cursor:pointer; background:rgba(243,156,18,0.1); color:#f39c12; border:none; padding:10px 20px; font-size:1rem; display:none;"><i class="fas fa-undo"></i> Şikayeti Yeniden Aç</button>
+                            <button id="action-object-btn" class="status-badge" style="cursor:pointer; background:rgba(192,57,43,0.1); color:#c0392b; border:none; padding:10px 20px; font-size:1rem; display:none;"><i class="fas fa-gavel"></i> Sonuca İtiraz Et</button>
+                        </div>
+                    </div>
+
+                    <!-- Files Section -->
+                    <div class="table-section mb-30" style="padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                        <div class="table-header" style="margin-bottom: 15px;">
+                            <h3 style="font-size: 1.05rem;"><i class="fas fa-paperclip"></i> Eklenen Evraklar</h3>
+                        </div>
+                        <div id="detail-files-container" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                            <!-- Expected to inject buttons or span here -->
+                        </div>
+                    </div>
+
+                    <!-- Logs Section -->
+                    <div id="detail-logs-section" class="table-section" style="padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                        <div class="table-header" style="margin-bottom: 15px;">
+                            <h3 style="font-size: 1.05rem;">İşlem Geçmişi & Loglar</h3>
+                        </div>
+                        <ul id="detail-logs-list" class="log-list" style="max-height: none;">
+                            <!-- Injected dynamically -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- App Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="tr-cities.js?v=2"></script>
+    <script src="app.js?v=12"></script>
+</body>
+
+</html>
