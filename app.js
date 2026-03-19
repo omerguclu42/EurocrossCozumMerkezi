@@ -1544,10 +1544,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (fSrvMonth && cMonth !== fSrvMonth) return;
                 if (fSrvStatus && c.status !== fSrvStatus) return;
                 if (fSrvTs && !String(c.data?.tsNumber || '').toLowerCase().includes(fSrvTs)) return;
-                if (fSrvCust && c.data?.customer !== fSrvCust) return;
+                if (fSrvCust && String(c.data?.customer || '').toLowerCase() !== fSrvCust) return;
                 if (fSrvName && !String(c.data?.name || '').toLowerCase().includes(fSrvName)) return;
-                if (fSrvType && c.data?.serviceType !== fSrvType) return;
-                if (fSrvProv && c.data?.provider !== fSrvProv) return;
+                if (fSrvType && String(c.data?.serviceType || '').toLowerCase() !== fSrvType) return;
+                if (fSrvProv && String(c.data?.provider || '').toLowerCase() !== fSrvProv) return;
                 if (fSrvDept && String(c.department || '').trim() !== fSrvDept) return;
                 srvRows.push(c);
             } else {
@@ -1555,7 +1555,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (fCallYear && cYear !== fCallYear) return;
                 if (fCallMonth && cMonth !== fCallMonth) return;
                 if (fCallStatus && c.status !== fCallStatus) return;
-                if (fCallCust && c.data?.customer !== fCallCust) return;
+                if (fCallCust && String(c.data?.customer || '').toLowerCase() !== fCallCust) return;
                 if (fCallName && !String(c.data?.name || '').toLowerCase().includes(fCallName)) return;
                 if (fCallPhone && !String(c.data?.phone || '').toLowerCase().includes(fCallPhone)) return;
                 if (fCallDept && String(c.department || '').trim() !== fCallDept) return;
