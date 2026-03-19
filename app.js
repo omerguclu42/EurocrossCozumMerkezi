@@ -3336,6 +3336,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (opTimeCard) opTimeCard.classList.add('hidden');
 
                 let wrpResp = document.getElementById('wrapper-monthly-responsible');
+                let wrpJustified = document.getElementById('wrapper-monthly-justified');
+                let wrpCloserTime = document.getElementById('wrapper-monthly-closer-time');
+                let wrpMatrixJustified = document.getElementById('wrapper-matrix-justified');
+                let wrpMatrixCloserTime = document.getElementById('wrapper-matrix-closer-time');
+                
                 let wrpCust = document.getElementById('wrapper-customer-pie');
                 let wrpProv = document.getElementById('wrapper-provider-bar');
                 let wrpOpTime = document.getElementById('wrapper-monthly-opinion-time');
@@ -3346,6 +3351,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 let wrpMatrixOpTime = document.getElementById('wrapper-matrix-opinion-time');
 
                 if (wrpResp) wrpResp.classList.add('hidden');
+                if (wrpJustified) wrpJustified.classList.add('hidden');
+                if (wrpCloserTime) wrpCloserTime.classList.add('hidden');
+                if (wrpMatrixJustified) wrpMatrixJustified.classList.add('hidden');
+                if (wrpMatrixCloserTime) wrpMatrixCloserTime.classList.add('hidden');
                 if (wrpCust) wrpCust.classList.add('hidden');
                 if (wrpProv) wrpProv.classList.add('hidden');
                 if (wrpOpTime) wrpOpTime.classList.add('hidden');
@@ -3377,6 +3386,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 let wrpMatrixOpTime = document.getElementById('wrapper-matrix-opinion-time');
 
                 if (wrpResp) wrpResp.classList.remove('hidden');
+                let wrpJustified = document.getElementById('wrapper-monthly-justified');
+                let wrpCloserTime = document.getElementById('wrapper-monthly-closer-time');
+                let wrpMatrixJustified = document.getElementById('wrapper-matrix-justified');
+                let wrpMatrixCloserTime = document.getElementById('wrapper-matrix-closer-time');
+                if (wrpJustified) wrpJustified.classList.remove('hidden');
+                if (wrpCloserTime) wrpCloserTime.classList.remove('hidden');
+                if (wrpMatrixJustified) wrpMatrixJustified.classList.remove('hidden');
+                if (wrpMatrixCloserTime) wrpMatrixCloserTime.classList.remove('hidden');
+                
                 if (wrpCust) wrpCust.classList.remove('hidden');
                 if (wrpProv) wrpProv.classList.remove('hidden');
                 if (wrpOpTime) wrpOpTime.classList.remove('hidden');
@@ -3547,6 +3565,12 @@ document.addEventListener('DOMContentLoaded', () => {
             let monthlyDeptOpened = Array.from({length: 12}, () => ({}));
             let monthlyDeptResponsible = Array.from({length: 12}, () => ({}));
             
+            // Phase 16 Matrices
+            let monthlyJustifiedCount = Array(12).fill(0);
+            let monthlyUnjustifiedCount = Array(12).fill(0);
+            let monthlyDeptJustified = Array.from({length: 12}, () => ({}));
+            let monthlyCloserResolveMs = Array.from({length: 12}, () => ({}));
+
             // Phase 4 New Matrices
             let monthlyDeptResolveMs = Array.from({length: 12}, () => ({}));
             let monthlyDeptOpinionMs = Array.from({length: 12}, () => ({}));
@@ -3681,8 +3705,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (c.status === 'Şikayet Sonuçlandı') {
                     totalConcludedCases++;
                     if (c.data && c.data.conclusion) {
-                        if (c.data.conclusion.verdict === 'Haklı') justifiedCount++;
-                        if (c.data.conclusion.verdict === 'Haksız') unjustifiedCount++;
+                        let isJustified = c.data.conclusion.verdict === 'Haklı';
+                        let isUnjustified = c.data.conclusion.verdict === 'Haksız';
+                        
+                        if (isJustified) justifiedCount++;
+                        if (isUnjustified) unjustifiedCount++;
+
+                        if (dMonth) {
+                            let mIdx = parseInt(dMonth, 10) - 1;
+                            if (mIdx >= 0 && mIdx <= 11) {
+                                if (isJustified) monthlyJustifiedCount[mIdx]++;
+                                if (isUnjustified) monthlyUnjustifiedCount[mIdx]++;
+                                
+                                let cDept = c.data.conclusion.department || 'Bilinmiyor';
+                                if (!monthlyDeptJustified[mIdx][cDept]) {
+                                    monthlyDeptJustified[mIdx][cDept] = { justified: 0, unjustified: 0 };
+                                }
+                                if (isJustified) monthlyDeptJustified[mIdx][cDept].justified++;
+                                if (isUnjustified) monthlyDeptJustified[mIdx][cDept].unjustified++;
+                            }
+                        }
                     }
                 }
                 
@@ -3771,6 +3813,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                 monthlyResolveTimes[mIdx].push(totalActiveMs);
                                 if(!monthlyDeptResolveMs[mIdx][rdDept]) monthlyDeptResolveMs[mIdx][rdDept] = [];
                                 monthlyDeptResolveMs[mIdx][rdDept].push(totalActiveMs);
+
+                                if (c.status === 'Şikayet Sonuçlandı' && c.data && c.data.conclusion) {
+                                    let closerName = c.data.conclusion.by || 'Yetkili';
+                                    if(!monthlyCloserResolveMs[mIdx][closerName]) monthlyCloserResolveMs[mIdx][closerName] = [];
+                                    monthlyCloserResolveMs[mIdx][closerName].push(totalActiveMs);
+                                }
                             }
                         }
                     }
@@ -3946,6 +3994,93 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMatrix(monthlyClosers, 'matrix-closer-table');
             renderTimeMatrix(monthlyCloserResponseMs, 'matrix-response-table');
 
+            // Phase 16: Render New Closer Time Matrix
+            renderTimeMatrix(monthlyCloserResolveMs, 'matrix-closer-time-table');
+
+            // Phase 16: Custom Matrix Render for Justified/Unjustified
+            const renderJustifiedMatrix = (dataMatrix, tableId) => {
+                let tbody = document.querySelector(`#${tableId} tbody`);
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                
+                let allDepts = new Set();
+                dataMatrix.forEach(monthMap => { Object.keys(monthMap).forEach(k => allDepts.add(k)); });
+                
+                let deptsArray = Array.from(allDepts).sort();
+                if(deptsArray.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;">Kayıt bulunamadı.</td></tr>';
+                    return;
+                }
+                
+                deptsArray.forEach((dept, index) => {
+                    let trMain = document.createElement('tr');
+                    trMain.style.cursor = 'pointer';
+                    trMain.style.backgroundColor = '#fdfdfd';
+                    
+                    let htmlMain = `<td style="text-align:left; font-weight:600;"><i class="fas fa-plus-square toggle-justified" style="color:var(--primary); margin-right:8px; display:inline-block; transition:0.3s;" data-target="dept-sub-${index}"></i> ${dept}</td>`;
+                    
+                    let rowTotalJustified = 0;
+                    let rowTotalUnjustified = 0;
+                    let arrJ = [];
+                    let arrU = [];
+                    
+                    for(let i=0; i<12; i++) {
+                        let jVal = dataMatrix[i][dept] ? dataMatrix[i][dept].justified : 0;
+                        let uVal = dataMatrix[i][dept] ? dataMatrix[i][dept].unjustified : 0;
+                        let sumVal = jVal + uVal;
+                        
+                        rowTotalJustified += jVal;
+                        rowTotalUnjustified += uVal;
+                        
+                        arrJ.push(jVal);
+                        arrU.push(uVal);
+                        
+                        htmlMain += `<td><span style="font-weight:bold;">${sumVal > 0 ? sumVal : '-'}</span></td>`;
+                    }
+                    htmlMain += `<td style="font-weight:bold; color:var(--primary-dark);">${rowTotalJustified + rowTotalUnjustified > 0 ? rowTotalJustified + rowTotalUnjustified : '-'}</td>`;
+                    trMain.innerHTML = htmlMain;
+                    tbody.appendChild(trMain);
+                    
+                    let trJustified = document.createElement('tr');
+                    trJustified.className = `dept-sub-${index} sub-row-hidden`;
+                    trJustified.style.display = 'none';
+                    trJustified.style.backgroundColor = 'rgba(231, 76, 60, 0.05)';
+                    let htmlJ = `<td style="text-align:left; padding-left: 30px; color:#e74c3c; font-weight:600;">Haklı</td>`;
+                    arrJ.forEach(val => { htmlJ += `<td style="color:#e74c3c;">${val > 0 ? val : '-'}</td>`; });
+                    htmlJ += `<td style="font-weight:bold; color:#e74c3c;">${rowTotalJustified > 0 ? rowTotalJustified : '-'}</td>`;
+                    trJustified.innerHTML = htmlJ;
+                    tbody.appendChild(trJustified);
+                    
+                    let trUnjustified = document.createElement('tr');
+                    trUnjustified.className = `dept-sub-${index} sub-row-hidden`;
+                    trUnjustified.style.display = 'none';
+                    trUnjustified.style.backgroundColor = 'rgba(39, 174, 96, 0.05)';
+                    let htmlU = `<td style="text-align:left; padding-left: 30px; color:#27ae60; font-weight:600;">Haksız</td>`;
+                    arrU.forEach(val => { htmlU += `<td style="color:#27ae60;">${val > 0 ? val : '-'}</td>`; });
+                    htmlU += `<td style="font-weight:bold; color:#27ae60;">${rowTotalUnjustified > 0 ? rowTotalUnjustified : '-'}</td>`;
+                    trUnjustified.innerHTML = htmlU;
+                    tbody.appendChild(trUnjustified);
+                    
+                    trMain.addEventListener('click', function() {
+                        let icon = this.querySelector('.toggle-justified');
+                        let subRows = tbody.querySelectorAll(`.dept-sub-${index}`);
+                        let isHidden = subRows[0].style.display === 'none';
+                        
+                        if (isHidden) {
+                            subRows.forEach(r => r.style.display = 'table-row');
+                            icon.classList.remove('fa-plus-square');
+                            icon.classList.add('fa-minus-square');
+                        } else {
+                            subRows.forEach(r => r.style.display = 'none');
+                            icon.classList.remove('fa-minus-square');
+                            icon.classList.add('fa-plus-square');
+                        }
+                    });
+                });
+            };
+            
+            renderJustifiedMatrix(monthlyDeptJustified, 'matrix-justified-table');
+
             // --- CHART RENDERING HELPER ---
             if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
 
@@ -4109,6 +4244,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderChart('chart-monthly-response-time', 'line', monthLabels, respDatasets, null, {
                     plugins: { legend: { display: true, position: 'bottom' } }
                 });
+                
+                // Phase 16: Closer Resolution Time Chart
+                let uniqueCloserResolvers = new Set();
+                monthlyCloserResolveMs.forEach(mObj => Object.keys(mObj).forEach(k => uniqueCloserResolvers.add(k)));
+                
+                let resDatasets = [];
+                let resColorIdx = 0;
+                uniqueCloserResolvers.forEach(resp => {
+                    let rData = [];
+                    for(let i=0; i<12; i++) { 
+                        let arr = monthlyCloserResolveMs[i][resp] || [];
+                        let avgHour = arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length)/3600000 : 0;
+                        rData.push(parseFloat(avgHour.toFixed(2))); 
+                    }
+                    resDatasets.push({
+                        label: resp,
+                        data: rData,
+                        borderColor: sharedColors[resColorIdx % sharedColors.length],
+                        backgroundColor: sharedColors[resColorIdx % sharedColors.length],
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    });
+                    resColorIdx++;
+                });
+                if(!globalUser.isClient) {
+                    renderChart('chart-monthly-closer-time', 'line', monthLabels, resDatasets, null, {
+                        plugins: { legend: { display: true, position: 'bottom' } }
+                    });
+                    
+                    // Phase 16: Justified / Unjustified Line Chart
+                    let justDatasets = [
+                        {
+                            label: 'Haklı Sonuçlananlar',
+                            data: monthlyJustifiedCount,
+                            borderColor: '#e74c3c', // Red
+                            backgroundColor: '#e74c3c',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Haksız Sonuçlananlar',
+                            data: monthlyUnjustifiedCount,
+                            borderColor: '#27ae60', // Green
+                            backgroundColor: '#27ae60',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ];
+                    renderChart('chart-monthly-justified', 'line', monthLabels, justDatasets, null, {
+                        plugins: { legend: { display: true, position: 'bottom' } }
+                    });
+                }
 
             if(!globalUser.isClient) {
                 renderChart('chart-customer-pie', 'doughnut', Object.keys(customerDist), Object.values(customerDist), sharedColors);

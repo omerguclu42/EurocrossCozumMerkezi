@@ -694,6 +694,24 @@
                             </table>
                         </div>
 
+                        <!-- Time Series: Haklı / Haksız -->
+                        <div id="wrapper-monthly-justified" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Ay Bazlı Haklı / Haksız (Dosya Sonucu) Trendi</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-monthly-justified"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- NEW Matrix: Haklı / Haksız (Departman Kırılımlı) -->
+                        <div id="wrapper-matrix-justified" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Departman Bazlı Haklı/Haksız Kırılımı</h3>
+                            <table class="data-table" id="matrix-justified-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Departman / Sonuç</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Toplam</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+
                         <!-- Time Series: Resolve Time -->
                         <div id="wrapper-monthly-resolve-time" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
                             <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Ay Bazlı Ort. Çözüm Süresi Trendi (Saat)</h3>
@@ -819,6 +837,23 @@
                             <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Yetkili Bazlı Aylık Ort. Karşılama Süresi</h3>
                             <table class="data-table" id="matrix-response-table" style="font-size: 0.8rem; width: 100%;">
                                 <thead><tr><th style="text-align:left;">Yetkili Kişi</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Ortalama</th></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Time Series: Yetkili Ort. Çözüm Süresi -->
+                        <div id="wrapper-monthly-closer-time" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Ay Bazlı Ort. Çözüm Süresi</h3>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="chart-monthly-closer-time"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- NEW Matrix: Yetkili Ort. Çözüm Süresi -->
+                        <div id="wrapper-matrix-closer-time" class="glass-panel" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow-x: auto;">
+                            <h3 style="font-size: 1.05rem; margin-bottom: 15px; color: var(--text-dark);">Yetkili Bazlı Aylık Ort. Çözüm Süreleri</h3>
+                            <table class="data-table" id="matrix-closer-time-table" style="font-size: 0.8rem; width: 100%;">
+                                <thead><tr><th style="text-align:left;">Yetkili (Kapatan Kişi)</th><th>Oca</th><th>Şub</th><th>Mar</th><th>Nis</th><th>May</th><th>Haz</th><th>Tem</th><th>Ağu</th><th>Eyl</th><th>Eki</th><th>Kas</th><th>Ara</th><th style="font-weight:bold; color:var(--primary-dark);">Ortalama</th></tr></thead>
                                 <tbody></tbody>
                             </table>
                         </div>
